@@ -40,6 +40,7 @@ start_usb() {
 	vendor=0x1d6b
 	product=0x0106
 	file0=$1
+	omap_dieid=$2
 
 	echo "Starting USB gadgets..."
 
@@ -53,8 +54,8 @@ start_usb() {
 	echo $product > idProduct
 	echo $vendor > idVendor
 	mkdir strings/0x409
-	echo my-serial-num > strings/0x409/serialnumber
-	echo my-manufacturer > strings/0x409/manufacturer
+	echo $omap_dieid > strings/0x409/serialnumber
+	echo "Network Improv" > strings/0x409/manufacturer
 	echo "Multi Gadget" > strings/0x409/product
 
 	mkdir configs/c.1
@@ -113,7 +114,18 @@ blink_leds() {
 }
 
 if echo $@ | grep really_install > /dev/null 2>&1; then
-	start_usb $emmc
+
+	omap_dieid=""
+
+	# Check the unique die ID so install knows which device to use
+	for arg in $(cat /proc/cmdline); do
+		if echo $arg | grep omap_dieid= > /dev/null; then
+			omap_dieid=$(echo $arg | sed -e s/omap_dieid=//)
+		fi
+		shift
+	done
+
+	start_usb $emmc $omap_dieid
 
 	echo "Waiting in mass storage mode to install, console at ttyACM..."
 	/sbin/getty -n -l /bin/sh /dev/ttyGS0 115200 &
