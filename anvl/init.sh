@@ -102,15 +102,37 @@ fi
 # Signal we're in install mode with the LEDs
 #
 blink_leds() {
-	echo 30 > /sys/class/leds/pca963x\:red/brightness
-	sleep 1
-	echo 0 > /sys/class/leds/pca963x\:red/brightness
+	case $1 in
+	install)
+		echo 30 > /sys/class/leds/pca963x\:red/brightness
+		sleep 1
+		echo 0 > /sys/class/leds/pca963x\:red/brightness
+		echo 30 > /sys/class/leds/pca963x\:green/brightness
+		sleep 1
+		echo 0 > /sys/class/leds/pca963x\:green/brightness
+		sleep 1
+		;;
+	error)
+		echo 30 > /sys/class/leds/pca963x\:red/brightness
+		usleep 100000
+		echo 0 > /sys/class/leds/pca963x\:red/brightness
+		usleep 100000
+		;;
+	esac
+}
 
-	echo 30 > /sys/class/leds/pca963x\:green/brightness
-	sleep 1
-	echo 0 > /sys/class/leds/pca963x\:green/brightness
+#
+# Run some sanity checks on hardware and loop blinking red LED
+# in case of error
+#
+check_block_device() {
+	if [ -b $1 ]; then
+		return 0
+	fi
 
-	sleep 1
+	while [ 1 ]; do
+		blink_leds error
+	done
 }
 
 if echo $@ | grep really_install > /dev/null 2>&1; then
@@ -127,10 +149,13 @@ if echo $@ | grep really_install > /dev/null 2>&1; then
 
 	start_usb $emmc $omap_dieid
 
-	echo "Waiting in mass storage mode to install, console at ttyACM..."
+	echo "Waiting in install mode, console at ttyACM..."
 	/sbin/getty -n -l /bin/sh /dev/ttyGS0 115200 &
+
+	check_block_device $emmc
+
 	while [ 1 ]; do
-		blink_leds
+		blink_leds install
 	done
 else
 	echo "Loading modules..."
