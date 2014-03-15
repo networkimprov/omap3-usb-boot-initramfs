@@ -102,15 +102,52 @@ fi
 # Signal we're in install mode with the LEDs
 #
 blink_leds() {
-	case $1 in
-	install)
-		echo 30 > /sys/class/leds/pca963x\:red/brightness
-		sleep 1
-		echo 0 > /sys/class/leds/pca963x\:red/brightness
-		echo 30 > /sys/class/leds/pca963x\:green/brightness
-		sleep 1
-		echo 0 > /sys/class/leds/pca963x\:green/brightness
-		sleep 1
+	option=$(cat /LED)
+	red="/sys/class/leds/pca963x:red/brightness"
+	green="/sys/class/leds/pca963x:green/brightness"
+	blue="/sys/class/leds/pca963x:blue/brightness"
+
+	# In microseconds
+	blink_rate=500000
+
+	echo 0 > $red
+	echo 0 > $green
+	echo 0 > $blue
+
+	case $option in
+	red)
+		echo 30 > $red
+		usleep $blink_rate
+		echo 0 > $red
+		usleep $blink_rate
+		;;
+	green)
+		echo 30 > $green
+		usleep $blink_rate
+		echo 0 > $green
+		usleep $blink_rate
+		;;
+	blue)
+		echo 30 > $blue
+		usleep $blink_rate
+		echo 0 > $blue
+		usleep $blink_rate
+		;;
+	yellow)
+		echo 30 > $red
+		echo 30 > $green
+		usleep $blink_rate
+		echo 0 > $red
+		echo 0 > $green
+		usleep $blink_rate
+		;;
+	orange)
+		echo 40 > $red
+		echo 20 > $green
+		usleep $blink_rate
+		echo 0 > $red
+		echo 0 > $green
+		usleep $blink_rate
 		;;
 	error)
 		echo 30 > /sys/class/leds/pca963x\:red/brightness
@@ -130,8 +167,9 @@ check_block_device() {
 		return 0
 	fi
 
+	echo "error" > /LED
 	while [ 1 ]; do
-		blink_leds error
+		blink_leds
 	done
 }
 
@@ -154,8 +192,9 @@ if echo $@ | grep really_install > /dev/null 2>&1; then
 
 	check_block_device $emmc
 
+	echo "yellow" > /LED
 	while [ 1 ]; do
-		blink_leds install
+		blink_leds
 	done
 else
 	echo "Loading modules..."
