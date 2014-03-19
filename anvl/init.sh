@@ -64,7 +64,7 @@ start_usb() {
 	echo "Conf 1" > configs/c.1/strings/0x409/configuration
 
 	mkdir configs/c.2
-	echo 120 > configs/c.2/MaxPower
+	echo 500 > configs/c.2/MaxPower
 	mkdir configs/c.2/strings/0x409
 	echo "Conf 2" > configs/c.2/strings/0x409/configuration
 
@@ -73,9 +73,9 @@ start_usb() {
 
 	mkdir functions/acm.0
 	mkdir functions/ecm.0
-	#mkdir functions/rndis.0
+	mkdir functions/rndis.0
 
-	#ln -s functions/rndis.0 configs/c.1
+	ln -s functions/rndis.0 configs/c.1
 	ln -s functions/acm.0 configs/c.1
 	ln -s functions/mass_storage.0 configs/c.1
 
@@ -143,7 +143,7 @@ blink_leds() {
 		;;
 	orange)
 		echo 40 > $red
-		echo 20 > $green
+		echo 10 > $green
 		usleep $blink_rate
 		echo 0 > $red
 		echo 0 > $green
@@ -189,6 +189,7 @@ if echo $@ | grep really_install > /dev/null 2>&1; then
 
 	echo "Waiting in install mode, console at ttyACM..."
 	/sbin/getty -n -l /bin/sh /dev/ttyGS0 115200 &
+	/sbin/getty -n -l /bin/sh /dev/ttyO2 115200 &
 
 	check_block_device $emmc
 
