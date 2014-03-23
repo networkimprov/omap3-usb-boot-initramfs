@@ -102,6 +102,11 @@ fi
 # Signal we're in install mode with the LEDs
 #
 blink_leds() {
+	if [ ! -f /LED ]; then
+		sleep 10
+		return 1
+	fi
+
 	option=$(cat /LED)
 	red="/sys/class/leds/pca963x:red/brightness"
 	green="/sys/class/leds/pca963x:green/brightness"
@@ -154,6 +159,9 @@ blink_leds() {
 		usleep 100000
 		echo 0 > /sys/class/leds/pca963x\:red/brightness
 		usleep 100000
+		;;
+	*)
+		sleep 10
 		;;
 	esac
 }
