@@ -55,7 +55,7 @@ start_usb() {
 	echo $vendor > idVendor
 	mkdir strings/0x409
 	echo $omap_dieid > strings/0x409/serialnumber
-	echo "Network Improv" > strings/0x409/manufacturer
+	echo "Anvl" > strings/0x409/manufacturer
 	echo "Multi Gadget" > strings/0x409/product
 
 	mkdir configs/c.1
