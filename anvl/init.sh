@@ -18,6 +18,9 @@ mount -t devtmpfs none /dev/
 # Install busybox symlinks
 #
 /bin/busybox --install -s > /dev/null 2>&1
+ln -s /bin/busybox /bin/tail
+ln -s /bin/busybox /bin/killall
+ln -s /bin/busybox /bin/find
 
 echo "Starting init script with cmdline options: $@"
 
