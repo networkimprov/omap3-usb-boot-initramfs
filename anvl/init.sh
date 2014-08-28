@@ -209,18 +209,8 @@ if echo $@ | grep really_install > /dev/null 2>&1; then
 		blink_leds
 	done
 else
-	echo "Loading modules..."
-	modprobe cfg80211
-	modprobe mwifiex
-	modprobe mwifiex_sdio
-
-	start_usb ""
-
 	echo "Mounting $rootfs as new root..."
 	mount $rootfs /mnt
-
-	#echo "Unconfiguring USB gadgets..."
-	#echo "" > /sys/kernel/config/usb_gadget/g1/UDC
 
 	echo "Unmounting temporary file systems..."
 	umount /proc
